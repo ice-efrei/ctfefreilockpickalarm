@@ -1,12 +1,13 @@
 #include <TM1637Display.h>
 
-#define CLK 3
-#define DIO 4
-#define BTN_RESET 12
-#define DEV_LED 3
+#define CLK D2 
+#define DIO D3
+#define BTN_RESET D1
+
+#define DEBUG 0
 
 const int nb_btns = 4;
-const int btns[] = {7, 8, 9, 10};
+const int btns[] = {D5, D6, D7, D8};
 
 bool loop_state = false;
 bool btn_states[4];
@@ -16,14 +17,13 @@ int t0 = 0;
 int tlog = 0;
 int state = 0;
 
-int sAudioPin = 11; // Speaker pin
+int sAudioPin = D4; // Speaker pin
 TM1637Display display = TM1637Display(CLK, DIO);
 
 void setup(){
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   pinMode(BTN_RESET, INPUT_PULLUP);
-  pinMode(DEV_LED, OUTPUT);
   for(int i = 0; i < nb_btns; i++){
     pinMode(btns[i], INPUT_PULLUP);
     btn_states[i] = false;
@@ -105,12 +105,14 @@ void displaystandby(){
 }
 
 void display_values() {
-    // Serial.print("loop_state: ");
-    // Serial.print(loop_state);
-    // Serial.print(" | ");
-    // Serial.print("rst_state: ");
-    // Serial.print(rst_state);
-    // Serial.print(" | ");
+    if (!DEBUG) return;
+
+    Serial.print("loop_state: ");
+    Serial.print(loop_state);
+    Serial.print(" | ");
+    Serial.print("rst_state: ");
+    Serial.print(rst_state);
+    Serial.print(" | ");
     
     for (int i = 0; i < nb_btns; i++){
         Serial.print(btn_states[i]);
@@ -165,7 +167,7 @@ void loop(){
         loop_state = false;
     }
 
-    if (millis() - tlog > 1000){
+    if (millis() - tlog > 1000 && DEBUG){
         display_values();
         if (loop_state){
             displaytime();
